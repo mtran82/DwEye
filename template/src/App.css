@@ -1,5 +1,5 @@
 body {
-  background-image: url("D:\DwEye\template\src\assets\dweye_logo.png");
+  background-image: url("assets\dweye_logo.png");
   background-size:contain;
   background-repeat:no-repeat;
   background-position: center center;
@@ -15,6 +15,9 @@ body {
   align-items: center;
   height: 100vh;
   width: 100%;
+  overflow: hidden;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .calibration-grid {
@@ -26,7 +29,151 @@ body {
 }
 
 .calibration-circle {
-  font-size: 8vh;
-  -webkit-user-select: none;
-  user-select: none;
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 80px;
+  height: 80px;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.calibration-dot {
+  display: grid;
+  place-items: center;
+  width: 60px;
+  height: 60px;
+  box-sizing: border-box;
+  border: 4px solid var(--text-h);
+  border-radius: 50%;
+  opacity: 0.3;
+  transform: scale(0.7);
+  transition: opacity 0.3s ease, transform 0.3s ease, background-color 0.3s ease,
+    border-color 0.3s ease;
+}
+
+.calibration-dot::after {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--bg);
+  opacity: 0;
+}
+
+.calibration-circle:is([data-status='countdown'], [data-status='pulse'], [data-status='capture'])
+  .calibration-dot {
+  opacity: 1;
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+.calibration-circle:is([data-status='countdown'], [data-status='pulse'], [data-status='capture'])
+  .calibration-dot::after {
+  opacity: 1;
+}
+
+.calibration-circle[data-status='countdown'] .calibration-dot {
+  transform: scale(0.6);
+}
+
+/* eyetrax pulses the radius as 15 + 15|sin(2πt)|: two beats a second */
+.calibration-circle[data-status='pulse'] .calibration-dot {
+  animation: calibration-pulse 0.25s ease-in-out infinite alternate;
+}
+
+.calibration-circle[data-status='capture'] .calibration-dot {
+  transform: scale(0.75);
+}
+
+.calibration-circle[data-status='done'] {
+  opacity: 0;
+  transform: scale(0.5);
+}
+
+/* Runs down from a full circle, like eyetrax's countdown arc */
+.calibration-ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.calibration-ring circle {
+  fill: none;
+  stroke: var(--text-h);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-dasharray: 100;
+  animation: calibration-ring var(--ring-ms) ease-in-out forwards;
+}
+
+@keyframes calibration-pulse {
+  from {
+    transform: scale(0.5);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes calibration-ring {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: 100;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .calibration-circle[data-status='pulse'] .calibration-dot {
+    animation: none;
+    transform: scale(0.75);
+  }
+}
+
+.calibration-caption {
+  position: fixed;
+  left: 50%;
+  top: 76%;
+  transform: translateX(-50%);
+  width: min(90vw, 36rem);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  pointer-events: none;
+}
+
+.calibration-caption strong {
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--text-h);
+}
+
+.calibration-caption span {
+  font-size: 15px;
+}
+
+.calibration-caption[data-tone='warn'] strong {
+  color: #e5484d;
+}
+
+.gaze-cursor {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 48px;
+  height: 48px;
+  margin: -24px 0 0 -24px;
+  box-sizing: border-box;
+  border: 5px solid var(--accent);
+  border-radius: 50%;
+  background: var(--accent-bg);
+  pointer-events: none;
+  transition: transform 80ms linear, opacity 0.2s ease;
+}
+
+.gaze-cursor[data-visible='false'] {
+  opacity: 0;
 }

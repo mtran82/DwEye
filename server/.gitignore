@@ -1,0 +1,4 @@
+.venv/
+__pycache__/
+# Trained gaze models are specific to the person who calibrated
+*.pkl

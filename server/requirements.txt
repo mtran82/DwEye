@@ -1,0 +1,3 @@
+# Tested on Python 3.12. eyetrax pins numpy<2, so newer Pythons will not work
+eyetrax>=0.4.0
+websockets>=17
