@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import './App.css'
 import CalibrationTarget from './CalibrationTarget.jsx'
 import { NINE_POINT_ORDER, useCalibration } from './calibration.js'
+import Keyboard from './keyboard/Keyboard.jsx'
 import { EYETRAX_URL, useEyetrax } from './eyetrax.js'
 
 // Row-major cells of the 3x3 grid
@@ -63,22 +64,6 @@ function caption(calibration, frame) {
   }
 }
 
-// Live gaze after calibration; fades out (in place) during blinks
-function GazeCursor({ gaze }) {
-  const [position, setPosition] = useState(gaze)
-  if (gaze && gaze !== position) setPosition(gaze)
-  if (!position) return null
-
-  const [x, y] = position
-  return (
-    <div
-      className="gaze-cursor"
-      data-visible={gaze != null}
-      style={{ transform: `translate(${x}px, ${y}px)` }}
-    />
-  )
-}
-
 function App() {
   const tracker = useEyetrax()
   const targetRefs = useRef([])
@@ -115,7 +100,7 @@ function App() {
         {detail && <span>{detail}</span>}
       </div>
 
-      {phase === 'done' && <GazeCursor gaze={tracker.frame.gaze} />}
+      {phase === 'done' && <Keyboard frame={tracker.frame} />}
     </div>
   )
 }

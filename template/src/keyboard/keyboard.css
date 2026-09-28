@@ -1,0 +1,139 @@
+/* Dwell keyboard, shown after calibration completes. Uses the same design
+   tokens as the calibration screen. */
+
+.kb {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 2vh 4vw;
+  gap: 2vh;
+  box-sizing: border-box;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Gaze cursor: visible but dimmed while the face is lost or blinking */
+.kb .gaze-cursor {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 48px;
+  height: 48px;
+  margin: -24px 0 0 -24px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0.85;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.kb .gaze-cursor[data-visible='false'] {
+  opacity: 0.25;
+}
+
+.kb-suggestions {
+  display: flex;
+  gap: 1vw;
+  justify-content: center;
+  height: 9vh;
+}
+
+.kb-suggestion {
+  flex: 1;
+  max-width: 16vw;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  font-size: 3.2vh;
+  color: var(--text-h);
+  background: var(--accent-bg);
+}
+
+.kb-suggestion[data-empty] {
+  background: transparent;
+  color: var(--text);
+}
+
+.kb-text {
+  min-height: 6vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--mono);
+  font-size: 3.6vh;
+  color: var(--text-h);
+  white-space: pre-wrap;
+}
+
+.kb-rows {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.6vh;
+}
+
+/* 20-column grid: every letter key spans exactly 2 columns, so all keys are
+   the same rectangle; row starts (2 and 3) produce the QWERTY stagger */
+.kb-row {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(20, 1fr);
+  gap: 1.2vw;
+}
+
+.kb-key {
+  grid-column: span 2;
+  position: relative;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  font-size: 4vh;
+  font-weight: 500;
+  color: var(--text-h);
+  background: var(--bg);
+  transition: border-color 0.15s ease;
+}
+
+.kb-row:nth-child(2) > .kb-key:first-child {
+  grid-column: 2 / span 2;
+}
+
+.kb-row:nth-child(3) > .kb-key:first-child {
+  grid-column: 3 / span 2;
+}
+
+.kb-key[data-action] {
+  font-size: 2.6vh;
+  letter-spacing: 1px;
+}
+
+/* Action row: backspace | space | ., centred, space double-width */
+.kb-row.kb-actions .kb-key:nth-child(1) {
+  grid-column: 3 / span 4;
+}
+
+.kb-row.kb-actions .kb-key:nth-child(2) {
+  grid-column: span 8;
+}
+
+.kb-row.kb-actions .kb-key:nth-child(3) {
+  grid-column: span 4;
+}
+
+.kb-key[data-active] {
+  border-color: var(--accent-border);
+}
+
+/* Dwell progress: fills the key from the centre as the timer runs */
+.kb-fill {
+  position: absolute;
+  inset: 0;
+  transform-origin: center;
+  background: var(--accent-bg);
+  border-radius: 10px;
+  pointer-events: none;
+}
