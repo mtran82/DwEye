@@ -60,14 +60,22 @@ body {
   opacity: 0;
 }
 
-.calibration-circle:is([data-status='countdown'], [data-status='pulse'], [data-status='capture'])
+.calibration-circle:is(
+    [data-status='countdown'],
+    [data-status='pulse'],
+    [data-status='capture']
+  )
   .calibration-dot {
   opacity: 1;
   border-color: var(--accent);
   background: var(--accent);
 }
 
-.calibration-circle:is([data-status='countdown'], [data-status='pulse'], [data-status='capture'])
+.calibration-circle:is(
+    [data-status='countdown'],
+    [data-status='pulse'],
+    [data-status='capture']
+  )
   .calibration-dot::after {
   opacity: 1;
 }
@@ -176,4 +184,148 @@ body {
 
 .gaze-cursor[data-visible='false'] {
   opacity: 0;
+}
+
+/* Adaptive-round target: placed at the server's blue-noise point */
+.adaptive-target {
+  position: fixed;
+  transform: translate(-50%, -50%);
+}
+
+.calibration-caption[data-position='top'] {
+  top: 12%;
+}
+
+/* Result after calibration: tracking confidence and gaze-dwell choices */
+.result {
+  --level: var(--text-h);
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(92vw, 56rem);
+  box-sizing: border-box;
+  padding: 28px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  background: var(--bg);
+}
+
+.result[data-level='high'] {
+  --level: #2f9e44;
+}
+
+.result[data-level='medium'] {
+  --level: #b7791f;
+}
+
+.result[data-level='low'] {
+  --level: #e5484d;
+}
+
+.result h2 {
+  margin: 0 0 12px;
+}
+
+.result-level {
+  font-size: 44px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--level);
+}
+
+/* Far apart, so imprecise gaze can't land on the wrong one */
+.result-choices {
+  display: flex;
+  gap: 12vw;
+  width: 100%;
+  margin: 24px 0 16px;
+}
+
+.result-choice {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  flex: 1;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  border: 3px solid var(--accent-border);
+  border-radius: 14px;
+}
+
+.result-choice strong {
+  font-size: 24px;
+  font-weight: 500;
+  color: var(--text-h);
+}
+
+.result-choice[data-active] {
+  border-color: var(--accent);
+}
+
+.result-choice[data-disabled] {
+  border-style: dashed;
+  border-color: var(--border);
+}
+
+.result-choice[data-disabled] strong {
+  font-size: 18px;
+  color: var(--text);
+}
+
+/* Dwell progress, left to right */
+.result-fill {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  transform-origin: left;
+  background: var(--accent-bg);
+}
+
+.result small {
+  font-size: 13px;
+}
+
+/* Blink-gesture feedback and the note after re-centring, over everything */
+.notice {
+  position: fixed;
+  top: 1.5vh;
+  left: 50%;
+  z-index: 10;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: 2px solid var(--accent-border);
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--text-h);
+  font-size: 16px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.notice-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--accent);
+  box-sizing: border-box;
+}
+
+.notice-dot[data-on] {
+  background: var(--accent);
+}
+
+.result-warn {
+  margin-top: 6px;
+  color: var(--level);
 }

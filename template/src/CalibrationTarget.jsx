@@ -8,12 +8,17 @@ import { CAPTURE_MS, FACE_HOLD_MS } from './calibration.js'
  *   capture    dot holds still while the ring runs down and samples are taken
  *   done       sampled; fades away
  */
+const RING_MS = {
+  countdown: FACE_HOLD_MS,
+  capture: CAPTURE_MS,
+}
+
 function CalibrationTarget({ ref, status }) {
-  const ringMs = status === 'countdown' ? FACE_HOLD_MS : CAPTURE_MS
+  const ringMs = RING_MS[status]
   return (
     <div ref={ref} className="calibration-circle" data-status={status} aria-hidden="true">
       <span className="calibration-dot" />
-      {(status === 'countdown' || status === 'capture') && (
+      {ringMs && (
         <svg
           className="calibration-ring"
           viewBox="0 0 80 80"

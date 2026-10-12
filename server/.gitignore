@@ -2,3 +2,5 @@
 __pycache__/
 # Trained gaze models are specific to the person who calibrated
 *.pkl
+# Calibration recordings (--record): face landmarks of whoever calibrated
+recordings/

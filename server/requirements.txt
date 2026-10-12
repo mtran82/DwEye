@@ -1,3 +1,4 @@
 # Tested on Python 3.12. eyetrax pins numpy<2, so newer Pythons will not work
-eyetrax>=0.4.0
+# face_features.LandmarkTap relies on eyetrax 0.4's GazeEstimator internals
+eyetrax>=0.4.0,<0.5
 websockets>=17

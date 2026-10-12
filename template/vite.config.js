@@ -14,12 +14,15 @@ const PYTHON = fileURLToPath(
   ),
 )
 
-// Runs server/eyetrax_server.py alongside `npm run dev` and stops it with it
+// Runs server/eyetrax_server.py alongside `npm run dev` and stops it with it.
+// EYETRAX_ARGS adds server flags (e.g. --record recordings); set
+// EYETRAX_SERVER=off to run the server yourself
 function eyetraxServer() {
   return {
     name: 'eyetrax-server',
     apply: 'serve',
     configureServer(server) {
+      if (process.env.EYETRAX_SERVER === 'off') return
       if (!existsSync(PYTHON)) {
         server.config.logger.warn(
           `[eyetrax] ${PYTHON} not found, so the eye tracker was not started. See server/README.md`,
@@ -28,7 +31,8 @@ function eyetraxServer() {
       }
       // stdin is a pipe so the server can exit if this process dies
       // without cleaning up (see --exit-with-parent)
-      const child = spawn(PYTHON, ['-u', 'eyetrax_server.py', '--exit-with-parent'], {
+      const extra = (process.env.EYETRAX_ARGS ?? '').split(' ').filter(Boolean)
+      const child = spawn(PYTHON, ['-u', 'eyetrax_server.py', '--exit-with-parent', ...extra], {
         cwd: SERVER_DIR,
         stdio: ['pipe', 'inherit', 'inherit'],
       })

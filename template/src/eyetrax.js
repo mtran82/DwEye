@@ -5,18 +5,24 @@ export const EYETRAX_URL =
   import.meta.env.VITE_EYETRAX_URL ?? 'ws://localhost:8765'
 
 const RECONNECT_MS = 1000
-const NO_FRAME = { face: false, blink: false, gaze: null }
+const NO_FRAME = { face: false, blink: false, gaze: null, head: null }
 
 /**
  * Connection to the eyetrax server. Reconnects until the server is up.
  *
- * frame      latest camera frame: { face, blink, gaze: [x, y] | null }
+ * connection counts successful connections, so state tied to one server
+ *            session can tell when the server may have restarted
+ * takeovers  counts times another page took over calibrating
+ * frame      latest camera frame: { face, blink, gaze: [x, y] | null,
+ *            head: [x, y, yaw, pitch, size] | null }
  * send       fire-and-forget message
  * request    send a message and resolve with the reply of type `replyType`
  * subscribe  call `listener` with every frame; returns an unsubscribe function
  */
 export function useEyetrax(url = EYETRAX_URL) {
   const [connected, setConnected] = useState(false)
+  const [connection, setConnection] = useState(0)
+  const [takeovers, setTakeovers] = useState(0)
   const [frame, setFrame] = useState(NO_FRAME)
   const socketRef = useRef(null)
   const listenersRef = useRef(new Set())
@@ -28,10 +34,8 @@ export function useEyetrax(url = EYETRAX_URL) {
     let disposed = false
     let retry
 
-    const rejectPending = () => {
-      for (const { reject } of pending.values()) {
-        reject(new Error('Lost connection to the eye tracker'))
-      }
+    const rejectPending = (reason = 'Lost connection to the eye tracker') => {
+      for (const { reject } of pending.values()) reject(new Error(reason))
       pending.clear()
     }
 
@@ -40,7 +44,9 @@ export function useEyetrax(url = EYETRAX_URL) {
       socketRef.current = socket
 
       socket.onopen = () => {
-        if (!disposed) setConnected(true)
+        if (disposed) return
+        setConnected(true)
+        setConnection((n) => n + 1)
       }
       socket.onmessage = (event) => {
         if (disposed) return
@@ -48,6 +54,16 @@ export function useEyetrax(url = EYETRAX_URL) {
         if (message.type === 'frame') {
           setFrame(message)
           for (const listener of listeners) listener(message)
+          return
+        }
+        // Another page is calibrating (see the server's protocol)
+        if (message.type === 'calibration_taken') {
+          rejectPending('Another window started calibrating')
+          setTakeovers((n) => n + 1)
+          return
+        }
+        if (message.type === 'error') {
+          rejectPending(message.error)
           return
         }
         const waiter = pending.get(message.type)
@@ -98,5 +114,5 @@ export function useEyetrax(url = EYETRAX_URL) {
     return () => listenersRef.current.delete(listener)
   }, [])
 
-  return { connected, frame, send, request, subscribe }
+  return { connected, connection, takeovers, frame, send, request, subscribe }
 }
